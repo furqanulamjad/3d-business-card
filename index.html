@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>3D Hover Business Card</title>
+  <style>
+    :root{
+      --bg: #0f1724;
+      --card-w: 380px;
+      --card-h: 220px;
+      --accent: #16a34a;
+      --outline: rgba(255,255,255,0.95);
+      --shine: linear-gradient(135deg, rgba(255,255,255,0.06), transparent 30%);
+      --transition: 350ms cubic-bezier(.2,.9,.3,1);
+    }
+
+    html,body{
+      height:100%;
+      margin:0;
+      display:grid;
+      place-items:center;
+      background:#0f1724;
+      font-family:Inter, Arial, sans-serif;
+      color:#e6eef8;
+    }
+
+    .stage{
+      perspective:1200px;
+      user-select:none;
+    }
+
+    .card{
+      width:var(--card-w);
+      height:var(--card-h);
+      border-radius:18px;
+      transform-style:preserve-3d;
+      transition: transform var(--transition), box-shadow var(--transition);
+      cursor:grab;
+      box-shadow: 0 18px 40px rgba(2,6,23,0.6);
+      position:relative;
+    }
+
+    .card.idle{
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float{
+      0%{transform:translateY(0)}
+      50%{transform:translateY(-6px)}
+      100%{transform:translateY(0)}
+    }
+
+    .card__inner{
+      position:absolute;
+      inset:0;
+      border-radius:18px;
+      background:rgba(255,255,255,0.05);
+      backdrop-filter:blur(6px);
+      transform-style:preserve-3d;
+      overflow:hidden;
+    }
+
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      border-radius:20px;
+      box-shadow:0 0 0 1px rgba(255,255,255,0);
+      opacity:0;
+      transform:scale(0.98);
+      transition:opacity .25s, transform .25s;
+    }
+
+    .card.hovered::before{
+      opacity:1;
+      box-shadow:0 0 0 2px var(--outline);
+      transform:scale(1.03);
+    }
+
+    .frontContent{ transform:translateZ(36px); }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      padding:22px;
+    }
+
+    .logo{
+      width:56px;
+      height:56px;
+      border-radius:10px;
+      background:var(--accent);
+      display:grid;
+      place-items:center;
+      font-weight:700;
+      font-size:20px;
+      color:#062218;
+    }
+
+    .meta .name{ font-size:18px; font-weight:600; }
+    .meta .title{ font-size:12px; opacity:0.7; }
+
+    .details{
+      padding:0 22px 18px 22px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+
+    .small{ font-size:12px; opacity:0.75; }
+
+    .chip{
+      padding:6px 10px;
+      background:rgba(255,255,255,0.08);
+      border-radius:8px;
+      font-size:12px;
+      margin-left:6px;
+    }
+
+    .card__inner::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:var(--shine);
+      mix-blend-mode:screen;
+      opacity:0.7;
+      transform:translateZ(60px);
+      pointer-events:none;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div id="card" class="card idle">
+      <div class="card__inner">
+        <div class="frontContent">
+          <div class="brand">
+            <div class="logo">FA</div>
+            <div class="meta">
+              <div class="name">Furqanul Amjad</div>
+              <div class="title">Creative Technical Director</div>
+            </div>
+          </div>
+
+          <div class="details">
+            <div>
+              <div class="small">Email: furqan@example.com</div>
+              <div class="small">Phone: +60 12-345 6789</div>
+            </div>
+
+            <div>
+              <span class="chip">Unreal</span>
+              <span class="chip">AR</span>
+              <span class="chip">Design</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  const card = document.getElementById("card");
+  let rect = null;
+
+  function updateRect(){ rect = card.getBoundingClientRect(); }
+  updateRect();
+
+  function onMove(e){
+    if(!rect) updateRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+
+    const rotateY = x * 20;
+    const rotateX = -y * 20;
+
+    card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`;
+  }
+
+  function enter(){
+    card.classList.add("hovered");
+    card.classList.remove("idle");
+  }
+  function leave(){
+    card.classList.remove("hovered");
+    card.classList.add("idle");
+    card.style.transform="";
+  }
+
+  card.addEventListener("pointerenter", enter);
+  card.addEventListener("pointerleave", leave);
+  card.addEventListener("pointermove", onMove);
+})();
+</script>
+
+</body>
+</html>
