@@ -22,6 +22,7 @@
       place-items:center;
       background: var(--bg);
       font-family:Inter, Arial, sans-serif;
+      cursor: auto;
     }
 
     .stage{
@@ -40,7 +41,16 @@
       position:relative;
     }
 
-    .card.idle { animation: none; }
+    /* IDLE FLOAT ANIMATION */
+    .card.idle {
+      animation: float 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes float {
+      0% { transform: rotateX(0deg) rotateY(0deg) scale(1); }
+      50% { transform: rotateX(2deg) rotateY(2deg) scale(1.01); }
+      100% { transform: rotateX(0deg) rotateY(0deg) scale(1); }
+    }
 
     .card__inner{
       position:absolute;
@@ -50,6 +60,7 @@
       overflow:hidden;
     }
 
+    /* SUBTLE PULSE OUTLINE */
     .card::before{
       content:"";
       position:absolute;
@@ -61,10 +72,22 @@
       transition:opacity .25s, transform .25s;
     }
 
+    .card.idle::before {
+      opacity: 0.05;
+      box-shadow: 0 0 10px rgba(255,255,255,0.2);
+      animation: pulse 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.05; }
+      100% { opacity: 0.15; }
+    }
+
     .card.hovered::before{
       opacity:1;
       box-shadow:0 0 0 2px var(--outline);
       transform:scale(1.03);
+      animation: none;
     }
 
     .frontContent{
@@ -92,7 +115,6 @@
       transform:translateZ(60px);
       pointer-events:none;
     }
-
 
     /* MOBILE FIX */
     @media (max-width: 600px) {
@@ -171,6 +193,21 @@
 
     card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`;
   });
+
+  /* CURSOR CHANGE HINT NEAR CARD */
+  document.addEventListener("mousemove", (e) => {
+    if(!rect) updateRect();
+    const distanceX = Math.abs(e.clientX - (rect.left + rect.width/2));
+    const distanceY = Math.abs(e.clientY - (rect.top + rect.height/2));
+    const radius = Math.max(rect.width, rect.height)/2;
+
+    if(distanceX < radius && distanceY < radius){
+      document.body.style.cursor = "grab";
+    } else {
+      document.body.style.cursor = "auto";
+    }
+  });
+
 })();
 </script>
 
