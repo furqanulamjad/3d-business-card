@@ -22,7 +22,6 @@
       place-items:center;
       background: var(--bg);
       font-family:Inter, Arial, sans-serif;
-      cursor: auto;
     }
 
     .stage{
@@ -41,16 +40,7 @@
       position:relative;
     }
 
-    /* IDLE FLOAT ANIMATION */
-    .card.idle {
-      animation: float 4s ease-in-out infinite alternate;
-    }
-
-    @keyframes float {
-      0% { transform: rotateX(0deg) rotateY(0deg) scale(1); }
-      50% { transform: rotateX(2deg) rotateY(2deg) scale(1.01); }
-      100% { transform: rotateX(0deg) rotateY(0deg) scale(1); }
-    }
+    .card.idle { animation: none; }
 
     .card__inner{
       position:absolute;
@@ -60,7 +50,6 @@
       overflow:hidden;
     }
 
-    /* SUBTLE PULSE OUTLINE */
     .card::before{
       content:"";
       position:absolute;
@@ -72,22 +61,10 @@
       transition:opacity .25s, transform .25s;
     }
 
-    .card.idle::before {
-      opacity: 0.05;
-      box-shadow: 0 0 10px rgba(255,255,255,0.2);
-      animation: pulse 2s ease-in-out infinite alternate;
-    }
-
-    @keyframes pulse {
-      0% { opacity: 0.05; }
-      100% { opacity: 0.15; }
-    }
-
     .card.hovered::before{
       opacity:1;
       box-shadow:0 0 0 2px var(--outline);
       transform:scale(1.03);
-      animation: none;
     }
 
     .frontContent{
@@ -105,11 +82,35 @@
       pointer-events:none;
     }
 
+    /* IDLE SHINE */
+    .card.idle .card__inner::after {
+      content:"";
+      position:absolute;
+      inset:0;
+      background: linear-gradient(
+        120deg,
+        rgba(255,255,255,0.0) 0%,
+        rgba(255,255,255,0.1) 50%,
+        rgba(255,255,255,0.0) 100%
+      );
+      mix-blend-mode: screen;
+      opacity: 0.6;
+      transform: translateX(-100%) translateZ(60px);
+      pointer-events:none;
+      animation: shine 3s linear infinite;
+    }
+
+    @keyframes shine {
+      0% { transform: translateX(-100%) translateZ(60px); }
+      100% { transform: translateX(100%) translateZ(60px); }
+    }
+
+    /* HOVER SHINE */
     .card__inner::after{
       content:"";
       position:absolute;
       inset:0;
-      background:var(--shine);
+      background: var(--shine);
       mix-blend-mode:screen;
       opacity:0.7;
       transform:translateZ(60px);
@@ -143,7 +144,6 @@
       </div>
     </div>
   </div>
-
 
 <script>
 (function(){
@@ -192,20 +192,6 @@
     const rotateX = -y * 20;
 
     card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`;
-  });
-
-  /* CURSOR CHANGE HINT NEAR CARD */
-  document.addEventListener("mousemove", (e) => {
-    if(!rect) updateRect();
-    const distanceX = Math.abs(e.clientX - (rect.left + rect.width/2));
-    const distanceY = Math.abs(e.clientY - (rect.top + rect.height/2));
-    const radius = Math.max(rect.width, rect.height)/2;
-
-    if(distanceX < radius && distanceY < radius){
-      document.body.style.cursor = "grab";
-    } else {
-      document.body.style.cursor = "auto";
-    }
   });
 
 })();
