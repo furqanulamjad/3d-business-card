@@ -4,11 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>3D Hover Business Card</title>
+
   <style>
     :root{
-      --bg: #000000; /* pure black background */
-      --card-w: 900px; /* card width */
-      --card-h: 320px; /* card height */
+      --bg: #000000;
+      --card-w: 900px;
+      --card-h: 320px;
       --outline: rgba(255,255,255,0.95);
       --shine: linear-gradient(135deg, rgba(255,255,255,0.06), transparent 30%);
       --transition: 350ms cubic-bezier(.2,.9,.3,1);
@@ -39,10 +40,7 @@
       position:relative;
     }
 
-    /* Remove idle floating */
-    .card.idle {
-      animation: none;
-    }
+    .card.idle { animation: none; }
 
     .card__inner{
       position:absolute;
@@ -95,9 +93,25 @@
       pointer-events:none;
     }
 
+
+    /* MOBILE FIX */
+    @media (max-width: 600px) {
+      :root {
+        --card-w: 90vw;
+        --card-h: calc(90vw * 0.355); /* keep correct proportion */
+      }
+
+      .stage {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
+    }
+
   </style>
 </head>
 <body>
+
   <div class="stage">
     <div id="card" class="card idle">
       <div class="card__inner">
@@ -107,6 +121,7 @@
       </div>
     </div>
   </div>
+
 
 <script>
 (function(){
@@ -137,9 +152,25 @@
     card.style.transform="";
   }
 
+  /* PC */
   card.addEventListener("pointerenter", enter);
   card.addEventListener("pointerleave", leave);
   card.addEventListener("pointermove", onMove);
+
+  /* MOBILE TOUCH SUPPORT */
+  card.addEventListener("touchstart", enter);
+  card.addEventListener("touchend", leave);
+  card.addEventListener("touchmove", function(e){
+    if(!rect) updateRect();
+    const touch = e.touches[0];
+    const x = (touch.clientX - rect.left) / rect.width - 0.5;
+    const y = (touch.clientY - rect.top) / rect.height - 0.5;
+
+    const rotateY = x * 20;
+    const rotateX = -y * 20;
+
+    card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`;
+  });
 })();
 </script>
 
